@@ -1,0 +1,13 @@
+{"event":"job_created","job_id":"job_sample","template_filename":"停车明细分析报告_模板.docx","data_filename":"data.csv","domain_context_filenames":[]}
+{"event":"file_saved","job_id":"job_sample","template_path":"/app/storage/jobs/job_sample/template_停车明细分析报告_模板.docx","data_path":"/app/storage/jobs/job_sample/data_data.csv","domain_context_paths":[]}
+{"event":"job_claimed_by_worker","job_id":"job_sample"}
+{"event":"data_validation_started","job_id":"job_sample","data_path":"/app/storage/jobs/job_sample/data_data.csv"}
+{"event":"data_validation_completed","job_id":"job_sample","row_count":3674}
+{"event":"metrics_computed","job_id":"job_sample","total_transactions":3674,"total_receivable":"105795.0","total_collected":"57397.5","total_actual_deductions":"48285.0","collection_rate_pct":"54.3","top_payment_method":"微信","top_payment_method_count":1435}
+{"event":"profiles_computed","job_id":"job_sample","payment_method_count":5,"payment_channel_count":4,"average_duration_hours":"3.27","over_12h_count":78,"template_section_count":5,"anomaly_candidate_count":4}
+{"event":"agent_planning_started","job_id":"job_sample"}
+{"event":"agent_planning_completed","job_id":"job_sample","planner_mode":"mock","fallback_used":false,"observation_count":3,"recommendation_count":3}
+{"event":"chart_rendering_started","job_id":"job_sample"}
+{"event":"chart_rendering_completed","job_id":"job_sample","chart_ids":["payment_method_distribution","payment_channel_distribution","parking_duration_distribution","entry_hour_distribution","charge_hour_distribution"]}
+{"event":"docx_generation_started","job_id":"job_sample","mode":"python_docx"}
+{"event":"job_completed","job_id":"job_sample","output_path":"/app/storage/jobs/job_sample/outputs/parking_detail_analysis_report.docx"}

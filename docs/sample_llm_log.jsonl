@@ -1,0 +1,2 @@
+{"event":"llm_call_started","job_id":"job_sample","agent_name":"ReportPlannerAgent","model":"gpt-4.1-mini","prompt":"请基于聚合 facts 生成 ReportPlan JSON。OPENAI_API_KEY=[REDACTED]"}
+{"event":"llm_call_completed","job_id":"job_sample","agent_name":"ReportPlannerAgent","model":"gpt-4.1-mini","response":"{\"selected_charts\":[{\"chart_id\":\"payment_method_distribution\"}],\"observations\":[...],\"recommendations\":[...]}","latency_ms":1240}
