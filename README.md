@@ -71,18 +71,21 @@ Agent 输出必须符合结构化 schema，并通过 `source_fact_ids` 和
 - Docker Desktop
 - Docker Compose v2
 
-### 2. 创建本地配置
-
-```bash
-cp .env.example .env
-```
-
-不配置 API key 也可以运行，系统默认进入 mock 模式。
-
-### 3. 启动服务
+### 2. 启动服务
 
 ```bash
 docker compose up --build
+```
+
+`.env` 是可选文件。不创建 `.env` 时，系统使用默认配置并进入 mock 模式，
+因此克隆仓库后可以直接使用上述单条命令启动。
+
+需要调用 OpenAI 或第三方 OpenAI-compatible API 时，再创建本地配置：
+
+```bash
+cp .env.example .env
+# 编辑 .env 后重启 API 和 worker
+docker compose up -d --build api worker
 ```
 
 首次构建需要下载 Python 依赖和 Noto CJK 中文字体，耗时会相对较长。启动后访问：
@@ -327,4 +330,3 @@ docker compose run --rm api pytest -q
 - 不要把真实 key 写入 README、代码、示例日志或前端环境变量
 - 上传文件和生成报告存储在 Docker volume 中，不应提交到 Git
 - 面向生产环境时还需要增加认证、授权、文件大小限制、恶意文档扫描和数据保留策略
-
