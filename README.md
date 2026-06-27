@@ -78,9 +78,13 @@ docker compose up --build
 ```
 
 `.env` 是可选文件。不创建 `.env` 时，系统使用默认配置并进入 mock 模式，
-因此克隆仓库后可以直接使用上述单条命令启动。
+因此克隆仓库后可以直接使用上述单条命令验证上传、异步任务、状态查询和
+Word 报告生成流程。mock 模式不会调用 LLM，只会使用预设的确定性规则生成
+报告计划，主要用于本地演示、自动测试和 LLM 调用失败时的 fallback。
 
-需要调用 OpenAI 或第三方 OpenAI-compatible API 时，再创建本地配置：
+要启用本项目的完整 Agent 智能分析能力，必须配置 OpenAI 或第三方
+OpenAI-compatible API。配置后，Agent 才会结合数据事实、模板说明和可选领域知识，
+判断应展示的图表、补充观察和管理建议。创建本地配置：
 
 ```bash
 cp .env.example .env
@@ -119,7 +123,8 @@ docker compose down -v
 
 ### Mock 模式
 
-适合检查完整工作流、API、前端和文档生成，不会调用外部 LLM：
+适合检查完整工作流、API、前端和文档生成，不会调用外部 LLM，也不代表真实的
+Agent 推理效果。报告内容由预设的确定性规则生成：
 
 ```dotenv
 OPENAI_API_KEY=
