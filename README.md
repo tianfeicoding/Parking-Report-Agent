@@ -16,6 +16,74 @@ Park Agent 是一个停车明细分析报告生成系统。用户上传停车交
 - 记录任务生命周期和 LLM 调用的结构化日志
 - LLM 不可用时自动回退到 deterministic mock planner
 
+## Agent 设计
+
+v1 采用一个 `ReportPlannerAgent`，不是多智能体系统。整体模式为：
+
+```text
+deterministic workflow
+  + single report-planning agent
+  + deterministic validators/renderers
+```
+
+Agent 不直接读取原始 CSV，也不计算金额、比例或 Word 样式。它读取前置工具生成的
+结构化 facts/context，决定哪些事实值得写入报告，并输出可校验的 `ReportPlan`。
+
+报告生成分为三个阶段：
+
+1. **事实准备**：代码完成 CSV 清洗、硬指标计算、支付与停车时长 profiling、
+   异常候选检测，并提取模板说明和可选领域知识。
+2. **Agent 规划**：`ReportPlannerAgent` 接收结构化 facts/context，判断哪些内容
+   对停车业务管理者有价值，选择报告图表，编写支付与时长摘要，并生成 2-3 条
+   补充观察和 2-4 条管理建议。
+3. **校验与渲染**：Agent 返回结构化 `ReportPlan`。每张图表、观察和建议必须通过
+   `source_fact_ids` / `source_context_ids` 引用输入依据；校验通过后，确定性渲染器
+   才会把指标、Agent 内容和真实数据图表写入 Word 模板。
+
+### 工具与职责
+
+**阶段一：Workflow 强制执行工具**
+
+这些工具每个 job 都必须执行，不由 LLM 决定是否调用：
+
+| 工具 | 作用 | 主要输出 |
+| --- | --- | --- |
+| `ParkingCsvLoader` | 清洗 CSV、校验字段、解析金额和时间 | `CleanedParkingData` |
+| `MetricsComputer` | 确定性计算六个硬指标 | `MetricsFacts` |
+| `PaymentProfiler` | 分析支付方式和渠道的笔数、占比及金额结构 | `PaymentProfile` |
+| `ParkingDurationProfiler` | 分析停车时长、长时停车和小时分布 | `DurationProfile` |
+| `TemplateInstructionExtractor` | 提取模板标题、章节和占位说明 | `TemplateInstructions` |
+| `DomainContextLoader` | 读取领域文件和用户处理说明 | `DomainContextPack` |
+| `AnomalyDetector` | 生成零实收、抵扣敞口、长时停车等候选关注点 | `AnomalyCandidates` |
+
+**阶段二：ReportPlannerAgent 决策能力**
+
+Agent 基于上述工具结果完成四类非确定性决策：
+
+| 决策能力 | Agent 负责判断的内容 |
+| --- | --- |
+| `ChartPlanSelector` | 从支付、时长、入场和收费分布图中选择有解释价值的图表 |
+| `SectionSummaryWriter` | 决定支付方式、渠道和停车时长章节的叙述重点 |
+| `ObservationSelector` | 从候选异常和 profiles 中选择 2-3 条管理者需要关注的观察 |
+| `RecommendationWriter` | 基于观察和领域上下文生成 2-4 条可执行建议 |
+
+Agent 输出的每张图表、观察和建议必须携带 `source_fact_ids`，引用领域知识时还要携带
+`source_context_ids`。LLM 不能创建不存在的事实，也不能覆盖六个硬指标。
+
+**阶段三：校验与渲染工具**
+
+| 工具 | 作用 |
+| --- | --- |
+| `ReportPlanValidator` | 校验 schema、图表/观察/建议数量及所有事实和上下文引用 |
+| `ChartRenderer` | 根据 Agent 选择和真实 profile 数据生成中文 PNG 图表 |
+| `DocxRenderer` | 打开原始模板，写入硬指标、Agent 内容和图表并生成 `.docx` |
+
+Agent 输出校验失败时，系统会把错误反馈给模型并修复一次；LLM 调用失败或修复后仍不合法
+时，使用 deterministic mock planner fallback。每次 LLM 调用的 prompt、response、
+model、latency 和状态都会记录。
+
+完整设计见 [docs/agent_design.md](docs/agent_design.md)。
+
 ## 技术栈
 
 - API：Python 3.12、FastAPI、SQLAlchemy
