@@ -396,10 +396,10 @@ Review Gate:
 - [x] 说明 API 使用方式
 - [x] 说明设计取舍
 - [ ] 生成 sample report
-- [ ] 添加脱敏 sample logs
+- [x] 添加脱敏 sample logs
 - [ ] 添加 GPLv3 `LICENSE`
-- [ ] 检查 `.gitignore`
-- [ ] 检查 GitHub 仓库不包含 `.env` 或 API key
+- [x] 检查 `.gitignore`
+- [x] 检查 GitHub 仓库不包含 `.env` 或 API key
 
 Done Criteria:
 
